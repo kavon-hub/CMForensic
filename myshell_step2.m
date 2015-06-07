@@ -21,14 +21,18 @@ for f = 1:step:nFrames-2*step+1
                 for n= 1:bw
                     cc = normxcorr2(reshape(ROFH(i,j,f:f+2*step-1), 1, 2*step), reshape(ROFH(m,n,:), 1, nFrames-1));
                     offsets = int32(find(cc>0.985)) - 2*step + 1;
-                    if ~isempty(offsets)
-                        [h,w] = size(offsets);
-                        if w == 1 && offsets(1) == f
-                            continue;
-                        end
-                        meat{fcount, icount} = {f, i, j, offsets, m, n};
-                        icount = icount + 1;
+                    offsets = sort(offsets, 'descend');
+                    w = size(offsets, 2);
+                    if (w == 0) || ((w == 1)&&(offsets(1) == f))
+                        continue;
                     end
+                    if offsets(1) == f
+                        offset = offsets(2);
+                    else
+                        offset = offsets(1);
+                    end
+                    meat{fcount, icount} = [f, i, j, offset, m, n];
+                    icount = icount + 1;
                 end
             end
                         
